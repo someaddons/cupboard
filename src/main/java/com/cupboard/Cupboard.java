@@ -1,7 +1,8 @@
-package com.template;
+package com.cupboard;
 
-import com.template.config.Configuration;
-import com.template.event.EventHandler;
+import com.cupboard.config.CommonConfiguration;
+import com.cupboard.config.CupboardConfig;
+import com.cupboard.event.EventHandler;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -14,18 +15,17 @@ import org.apache.logging.log4j.Logger;
 
 import java.util.Random;
 
-import static com.template.TemplateMod.MOD_ID;
+import static com.cupboard.Cupboard.MOD_ID;
 
-// The value here should match an entry in the META-INF/mods.toml file
 @Mod(MOD_ID)
-public class TemplateMod
+public class Cupboard
 {
-    public static final String        MOD_ID = "template";
-    public static final Logger        LOGGER = LogManager.getLogger();
-    private static      Configuration config = null;
-    public static       Random        rand   = new Random();
+    public static final String        MOD_ID = "cupboard";
+    public static final Logger                              LOGGER = LogManager.getLogger();
+    private static      CupboardConfig<CommonConfiguration> config = null;
+    public static       Random                              rand   = new Random();
 
-    public TemplateMod()
+    public Cupboard()
     {
         ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> "", (a, b) -> true));
         Mod.EventBusSubscriber.Bus.FORGE.bus().get().register(EventHandler.class);
@@ -37,19 +37,19 @@ public class TemplateMod
     public void clientSetup(FMLClientSetupEvent event)
     {
         // Side safe client event handler
-        TemplateClient.onInitializeClient(event);
+        CupboardClient.onInitializeClient(event);
     }
 
     private void setup(final FMLCommonSetupEvent event)
     {
-        LOGGER.info(MOD_ID + " mod initialized");
+        LOGGER.info(MOD_ID + " loaded");
     }
 
-    public static Configuration getConfig()
+    public static CupboardConfig<CommonConfiguration> getConfig()
     {
         if (config == null)
         {
-            config = new Configuration();
+            config = new CupboardConfig<>(MOD_ID,new CommonConfiguration());
             config.load();
         }
 

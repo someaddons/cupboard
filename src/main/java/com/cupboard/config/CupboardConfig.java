@@ -1,9 +1,9 @@
-package com.template.config;
+package com.cupboard.config;
 
+import com.cupboard.Cupboard;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import com.template.TemplateMod;
 import net.minecraftforge.fml.loading.FMLPaths;
 
 import java.io.BufferedWriter;
@@ -12,34 +12,36 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class Configuration
+public class CupboardConfig<C extends ICommonConfig>
 {
     /**
      * Loaded everywhere, not synced
      */
-    private final CommonConfiguration commonConfig = new CommonConfiguration();
+    private final C commonConfig;
+    private final String        filename;
 
     /**
      * Loaded clientside, not synced
      */
-    // private final ClientConfiguration clientConfig;
-    final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    final static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     /**
      * Builds configuration tree.
      */
-    public Configuration()
+    public CupboardConfig(final String filename, final C commonConfig)
     {
+        this.commonConfig = commonConfig;
+        this.filename = filename;
     }
 
     public void load()
     {
-        final Path configPath = FMLPaths.CONFIGDIR.get().resolve(TemplateMod.MOD_ID + ".json");
+        final Path configPath = FMLPaths.CONFIGDIR.get().resolve(filename + ".json");
         final File config = configPath.toFile();
 
         if (!config.exists())
         {
-            TemplateMod.LOGGER.warn("Config not found, recreating default");
+            Cupboard.LOGGER.warn("Config " + filename + " not found, recreating default");
             save();
         }
         else
@@ -50,14 +52,15 @@ public class Configuration
             }
             catch (Exception e)
             {
-                TemplateMod.LOGGER.error("Could not read config from:" + configPath, e);
+                Cupboard.LOGGER.error("Could not read config " + filename + " from:" + configPath, e);
+                save();
             }
         }
     }
 
     public void save()
     {
-        final Path configPath = FMLPaths.CONFIGDIR.get().resolve(TemplateMod.MOD_ID + ".json");
+        final Path configPath = FMLPaths.CONFIGDIR.get().resolve(filename + ".json");
         try
         {
             final BufferedWriter writer = Files.newBufferedWriter(configPath);
@@ -66,11 +69,11 @@ public class Configuration
         }
         catch (IOException e)
         {
-            TemplateMod.LOGGER.error("Could not write config to:" + configPath, e);
+            Cupboard.LOGGER.error("Could not write config " + filename + " to:" + configPath, e);
         }
     }
 
-    public CommonConfiguration getCommonConfig()
+    public C getCommonConfig()
     {
         return commonConfig;
     }
