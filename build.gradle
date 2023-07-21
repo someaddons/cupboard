@@ -85,6 +85,7 @@ repositories{
     maven {
         url "https://www.cursemaven.com"
     }
+    mavenLocal()
 }
 
 mixin {
@@ -113,5 +114,13 @@ jar {
 }
 
 jar.finalizedBy('reobfJar')
+
+publishing {
+    publications {
+        register('mavenJava', MavenPublication) {
+            artifact jar
+        }
+    }
+}
 
 

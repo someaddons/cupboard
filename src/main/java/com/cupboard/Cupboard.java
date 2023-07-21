@@ -31,6 +31,11 @@ public class Cupboard
         Mod.EventBusSubscriber.Bus.FORGE.bus().get().register(EventHandler.class);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
+
+        for(CupboardConfig config: CupboardConfig.allConfigs)
+        {
+            config.getCommonConfig();
+        }
     }
 
     @SubscribeEvent

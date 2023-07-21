@@ -11,6 +11,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CupboardConfig<C extends ICommonConfig>
 {
@@ -19,6 +21,9 @@ public class CupboardConfig<C extends ICommonConfig>
      */
     private final C commonConfig;
     private final String        filename;
+    private boolean loaded = false;
+
+    public static List<CupboardConfig> allConfigs = new ArrayList<>();
 
     /**
      * Loaded clientside, not synced
@@ -32,10 +37,12 @@ public class CupboardConfig<C extends ICommonConfig>
     {
         this.commonConfig = commonConfig;
         this.filename = filename;
+        allConfigs.add(this);
     }
 
     public void load()
     {
+        loaded = true;
         final Path configPath = FMLPaths.CONFIGDIR.get().resolve(filename + ".json");
         final File config = configPath.toFile();
 
@@ -43,6 +50,7 @@ public class CupboardConfig<C extends ICommonConfig>
         {
             Cupboard.LOGGER.warn("Config " + filename + " not found, recreating default");
             save();
+            load();
         }
         else
         {
@@ -54,6 +62,7 @@ public class CupboardConfig<C extends ICommonConfig>
             {
                 Cupboard.LOGGER.error("Could not read config " + filename + " from:" + configPath, e);
                 save();
+                load();
             }
         }
     }
@@ -75,6 +84,11 @@ public class CupboardConfig<C extends ICommonConfig>
 
     public C getCommonConfig()
     {
+        if (!loaded)
+        {
+            load();
+        }
+
         return commonConfig;
     }
 }
