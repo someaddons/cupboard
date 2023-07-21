@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "id": "cupboard",
+  "version": "${version}",
+
+  "name": "cupboard",
+  "description": "",
+  "authors": [
+    "Someaddon"
+  ],
+  "contact": {
+    "homepage": "",
+    "sources": ""
+  },
+
+  "license": "ARR",
+  "icon": "assets/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "com.cupboard.Cupboard"
+    ],
+    "client": [
+      "com.cupboard.CupboardClient"
+    ]
+  },
+  "mixins": [
+    "cupboard.mixins.json"
+  ],
+  "accessWidener": "cupboard.accessWidener",
+  "depends": {
+    "fabricloader": ">=0.11.3",
+    "fabric": "*",
+    "minecraft": "1.20.x",
+    "java": ">=17"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}
