@@ -3,6 +3,7 @@ package com.cupboard;
 import com.cupboard.config.CommonConfiguration;
 import com.cupboard.config.CupboardConfig;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -16,9 +17,12 @@ public class Cupboard implements ModInitializer {
     public static Random rand = new Random();
 
     public Cupboard() {
-        for (CupboardConfig config : CupboardConfig.allConfigs) {
-            config.getCommonConfig();
-        }
+        // TODO disable
+        getConfig();
+
+        CupboardConfig.initloadAll();
+
+        ServerTickEvents.END_SERVER_TICK.register(s -> CupboardConfig.pollConfigs());
     }
 
     public static CupboardConfig<CommonConfiguration> getConfig() {
