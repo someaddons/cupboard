@@ -15,22 +15,20 @@ public class CommonConfiguration implements ICommonConfig
     {
         final JsonObject root = new JsonObject();
 
-        /*final JsonObject entry = new JsonObject();
+        final JsonObject entry = new JsonObject();
         entry.addProperty("desc:", "Whether to skip weather after sleeping: default:false");
         entry.addProperty("skipWeatherOnSleep", skipWeatherOnSleep);
-        root.add("skipWeatherOnSleep", entry);*/
+        root.add("skipWeatherOnSleep", entry);
 
         return root;
     }
 
     public void deserialize(JsonObject data)
     {
-        if (data == null)
-        {
-            Cupboard.LOGGER.error("Config file was empty!");
-            return;
+        if (Cupboard.rand.nextInt(5) == 0) {
+            throw new RuntimeException("Config error test, only for dev");
         }
 
-        // skipWeatherOnSleep = data.get("skipWeatherOnSleep").getAsJsonObject().get("skipWeatherOnSleep").getAsBoolean();
+        skipWeatherOnSleep = data.get("skipWeatherOnSleep").getAsJsonObject().get("skipWeatherOnSleep").getAsBoolean();
     }
 }

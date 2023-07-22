@@ -29,13 +29,9 @@ public class Cupboard
     {
         ModLoadingContext.get().registerExtensionPoint(IExtensionPoint.DisplayTest.class, () -> new IExtensionPoint.DisplayTest(() -> "", (a, b) -> true));
         Mod.EventBusSubscriber.Bus.FORGE.bus().get().register(EventHandler.class);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::setup);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientSetup);
 
-        for(CupboardConfig config: CupboardConfig.allConfigs)
-        {
-            config.getCommonConfig();
-        }
+        CupboardConfig.initloadAll();
     }
 
     @SubscribeEvent
@@ -45,17 +41,11 @@ public class Cupboard
         CupboardClient.onInitializeClient(event);
     }
 
-    private void setup(final FMLCommonSetupEvent event)
-    {
-        LOGGER.info(MOD_ID + " loaded");
-    }
-
     public static CupboardConfig<CommonConfiguration> getConfig()
     {
         if (config == null)
         {
             config = new CupboardConfig<>(MOD_ID,new CommonConfiguration());
-            config.load();
         }
 
         return config;
