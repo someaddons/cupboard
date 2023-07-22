@@ -17,8 +17,7 @@ public class Cupboard implements ModInitializer {
     public static Random rand = new Random();
 
     public Cupboard() {
-        // TODO disable
-        getConfig();
+        //getConfig();
 
         CupboardConfig.initloadAll();
 
