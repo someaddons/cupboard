@@ -10,7 +10,7 @@ public class CupboardClient implements ClientModInitializer {
 
     @Override
     public void onInitializeClient() {
-        ClientTickEvents.END_CLIENT_TICK.register(world -> {
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (!Minecraft.getInstance().hasSingleplayerServer()) {
                 CupboardConfig.pollConfigs();
             }

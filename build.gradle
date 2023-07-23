@@ -83,4 +83,10 @@ java {
 }
 
 publishing {
+    publications {
+        register('mavenJava', MavenPublication) {
+            artifact jar
+        }
+    }
 }
+
