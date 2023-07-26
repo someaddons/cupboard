@@ -2,6 +2,7 @@ package com.cupboard.event;
 
 import com.cupboard.config.CupboardConfig;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 
 /**
@@ -16,5 +17,11 @@ public class EventHandler
         {
             CupboardConfig.pollConfigs();
         }
+    }
+
+    @SubscribeEvent
+    public static void serverstart(ServerStartedEvent event)
+    {
+        CupboardConfig.initloadAll();
     }
 }
