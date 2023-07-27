@@ -123,7 +123,7 @@ public class CupboardConfig<C extends ICommonConfig> {
     /**
      * Loaded clientside, not synced
      */
-    final static Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    final static Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
 
     /**
      * Builds configuration tree.
