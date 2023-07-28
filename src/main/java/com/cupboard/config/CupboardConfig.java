@@ -28,7 +28,7 @@ public class CupboardConfig<C extends ICommonConfig> {
 
     private static Set<CupboardConfig> allConfigs = new HashSet<>();
     private static WatchService watchService = null;
-    private static Map<WatchKey, CupboardConfig> watchedConfigs = new HashMap<>();
+    private static Map<String, CupboardConfig> watchedConfigs = new HashMap<>();
     private final static Map<CupboardConfig, Integer> scheuledReloads = new HashMap<>();
     private static long lastUpdate = 0;
 
@@ -49,7 +49,8 @@ public class CupboardConfig<C extends ICommonConfig> {
         if (!allConfigs.contains(config)) {
             allConfigs.add(config);
             try {
-                watchedConfigs.put(config.configPath.getParent().register(getWatchService(), StandardWatchEventKinds.ENTRY_MODIFY), config);
+                config.configPath.getParent().register(getWatchService(), StandardWatchEventKinds.ENTRY_MODIFY);
+                watchedConfigs.put(config.filename, config);
             } catch (IOException e) {
                 Cupboard.LOGGER.warn("Failed to register config path to file watcher", e);
             }
@@ -87,13 +88,18 @@ public class CupboardConfig<C extends ICommonConfig> {
             for (WatchEvent<?> event : watchKey.pollEvents()) {
                 if (event.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
 
-                    final CupboardConfig config = watchedConfigs.get(watchKey);
-
-                    if (config.saveCounter > 0) {
-                        config.saveCounter = 0;
-                    } else {
-                        // schedule reload to happen in 10sec, or refresh existing to 10s
-                        scheuledReloads.put(config, 10);
+                    final CupboardConfig config = watchedConfigs.get(event.context().toString());
+                     if (config != null)
+                    {
+                        if (config.saveCounter > 0)
+                        {
+                            config.saveCounter = 0;
+                        }
+                        else
+                        {
+                            // schedule reload to happen in 10sec, or refresh existing to 10s
+                            scheuledReloads.put(config, 10);
+                        }
                     }
                 }
             }
@@ -130,8 +136,8 @@ public class CupboardConfig<C extends ICommonConfig> {
      */
     public CupboardConfig(final String filename, final C commonConfig) {
         this.commonConfig = commonConfig;
-        this.filename = filename;
-        configPath = FabricLoader.getInstance().getConfigDir().normalize().resolve(filename + ".json");
+        this.filename = filename.replace(".json","")+".json";
+        configPath = FabricLoader.getInstance().getConfigDir().normalize().resolve(this.filename);
         registerConfig(this);
     }
 
