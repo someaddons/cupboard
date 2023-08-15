@@ -14,7 +14,7 @@ public class Cupboard implements ModInitializer {
 
     public static final String MOD_ID = "cupboard";
     public static final Logger LOGGER = LogManager.getLogger();
-    private static CupboardConfig<CommonConfiguration> config = null;
+    public static CupboardConfig<CommonConfiguration> config = new CupboardConfig(MOD_ID, new CommonConfiguration());
     public static Random rand = new Random();
 
     public Cupboard() {
@@ -22,15 +22,6 @@ public class Cupboard implements ModInitializer {
 
         ServerTickEvents.END_SERVER_TICK.register(s -> CupboardConfig.pollConfigs());
         ServerLifecycleEvents.SERVER_STARTED.register(s -> CupboardConfig.initloadAll());
-    }
-
-    public static CupboardConfig<CommonConfiguration> getConfig() {
-        if (config == null) {
-            config = new CupboardConfig<>(MOD_ID, new CommonConfiguration());
-            config.load();
-        }
-
-        return config;
     }
 
     @Override
