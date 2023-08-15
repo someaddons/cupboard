@@ -1,11 +1,10 @@
 package com.cupboard.config;
 
-import com.cupboard.Cupboard;
 import com.google.gson.JsonObject;
 
 public class CommonConfiguration implements ICommonConfig
 {
-     public boolean skipWeatherOnSleep = false;
+    public boolean showCommandExecutionErrors = true;
 
     public CommonConfiguration()
     {
@@ -16,19 +15,15 @@ public class CommonConfiguration implements ICommonConfig
         final JsonObject root = new JsonObject();
 
         final JsonObject entry = new JsonObject();
-        entry.addProperty("desc:", "Whether to skip weather after sleeping: default:false");
-        entry.addProperty("skipWeatherOnSleep", skipWeatherOnSleep);
-        root.add("skipWeatherOnSleep", entry);
+        entry.addProperty("desc:", "Whether to display errors during command execution: default:true");
+        entry.addProperty("showCommandExecutionErrors", showCommandExecutionErrors);
+        root.add("showCommandExecutionErrors", entry);
 
         return root;
     }
 
     public void deserialize(JsonObject data)
     {
-        if (Cupboard.rand.nextInt(5) == 0) {
-            throw new RuntimeException("Config error test, only for dev");
-        }
-
-        skipWeatherOnSleep = data.get("skipWeatherOnSleep").getAsJsonObject().get("skipWeatherOnSleep").getAsBoolean();
+        showCommandExecutionErrors = data.get("showCommandExecutionErrors").getAsJsonObject().get("showCommandExecutionErrors").getAsBoolean();
     }
 }
