@@ -1,5 +1,6 @@
 {
-  "required": true,
+  "required": false,
+  "minVersion": "0.8",
   "package": "com.cupboard.mixin",
   "compatibilityLevel": "JAVA_17",
   "refmap": "cupboard.refmap.json",
@@ -11,7 +12,6 @@
   "client": [
   ],
   "injectors": {
-    "defaultRequire": 1
-  },
-  "minVersion": "0.8"
+    "defaultRequire": 0
+  }
 }
