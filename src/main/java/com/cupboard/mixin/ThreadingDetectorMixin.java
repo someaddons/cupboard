@@ -11,7 +11,7 @@ import java.util.stream.Stream;
 public class ThreadingDetectorMixin
 {
     @Redirect(method = "makeThreadingException", at = @At(value = "INVOKE", target = "Ljava/util/stream/Stream;of([Ljava/lang/Object;)Ljava/util/stream/Stream;"))
-    private static <T> Stream<T> onGetThreads(final T[] values)
+    private static <T> Stream<T> cupboard$writeAllThreads(final T[] values)
     {
         return (Stream<T>) Thread.getAllStackTraces().keySet().stream();
     }
