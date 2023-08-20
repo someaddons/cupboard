@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public class CommandExceptionLoggingMixin
 {
     @Redirect(method = "performCommand", at = @At(value = "INVOKE", target = "Lorg/slf4j/Logger;isDebugEnabled()Z", remap = false))
-    private boolean on(final Logger instance)
+    private boolean cupboard$logCommandError(final Logger instance)
     {
         return instance.isDebugEnabled() || Cupboard.config.getCommonConfig().showCommandExecutionErrors;
     }

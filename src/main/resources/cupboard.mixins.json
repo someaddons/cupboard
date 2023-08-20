@@ -7,7 +7,8 @@
   "mixinPriority": 200,
   "mixins": [
     "CommandExceptionLoggingMixin",
-    "ThreadingDetectorMixin"
+    "ThreadingDetectorMixin",
+    "ChunkLoadDebug"
   ],
   "client": [
   ],
