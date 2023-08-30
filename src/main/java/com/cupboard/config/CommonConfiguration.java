@@ -6,6 +6,7 @@ public class CommonConfiguration implements ICommonConfig
 {
     public boolean showCommandExecutionErrors = true;
     public boolean debugChunkloadAttempts = false;
+    public boolean logOffthreadEntityAdd = true;
 
     public CommonConfiguration()
     {
@@ -25,6 +26,11 @@ public class CommonConfiguration implements ICommonConfig
         entry2.addProperty("debugChunkloadAttempts", debugChunkloadAttempts);
         root.add("debugChunkloadAttempts", entry2);
 
+        final JsonObject entry3 = new JsonObject();
+        entry3.addProperty("desc:", "Entities should only be added on the server thread itself, cupboard fixes the crashes caused by mods violating that, this option enables the logging of those: default:true");
+        entry3.addProperty("logOffthreadEntityAdd", logOffthreadEntityAdd);
+        root.add("logOffthreadEntityAdd", entry3);
+
         return root;
     }
 
@@ -32,5 +38,6 @@ public class CommonConfiguration implements ICommonConfig
     {
         showCommandExecutionErrors = data.get("showCommandExecutionErrors").getAsJsonObject().get("showCommandExecutionErrors").getAsBoolean();
         debugChunkloadAttempts = data.get("debugChunkloadAttempts").getAsJsonObject().get("debugChunkloadAttempts").getAsBoolean();
+        logOffthreadEntityAdd = data.get("logOffthreadEntityAdd").getAsJsonObject().get("logOffthreadEntityAdd").getAsBoolean();
     }
 }
