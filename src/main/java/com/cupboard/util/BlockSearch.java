@@ -13,7 +13,7 @@ public class BlockSearch
      */
     final BiPredicate<BlockGetter, BlockPos> DOUBLE_AIR        =
       (world, pos) -> world.getBlockState(pos).isAir() && world.getBlockState(pos.above()).isAir();
-    final BiPredicate<BlockGetter, BlockPos> DOUBLE_AIR_GROUND = DOUBLE_AIR.and((world, pos) -> world.getBlockState(pos.below()).isSolid());
+    final BiPredicate<BlockGetter, BlockPos> DOUBLE_AIR_GROUND = DOUBLE_AIR.and((world, pos) -> world.getBlockState(pos.below()).getMaterial().isSolid());
 
     /**
      * Finds a nice position around a given start, creeping outwards
