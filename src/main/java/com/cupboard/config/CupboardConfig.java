@@ -3,6 +3,7 @@ package com.cupboard.config;
 import com.cupboard.Cupboard;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import net.minecraftforge.fml.loading.FMLPaths;
 
@@ -161,17 +162,43 @@ public class CupboardConfig<C extends ICommonConfig> {
                 load();
             }
         } else {
+
+            JsonObject jsonFileData = null;
             try (BufferedReader reader = Files.newBufferedReader(configPath)) {
-                commonConfig.deserialize(gson.fromJson(reader, JsonObject.class));
+
+                jsonFileData = gson.fromJson(reader, JsonObject.class);
+                commonConfig.deserialize(jsonFileData);
                 Cupboard.LOGGER.info("Loaded config for: " + filename);
             } catch (Exception e) {
+
+                if (jsonFileData != null)
+                {
+                    final JsonObject defaultConfig = commonConfig.serialize();
+
+                    // Add missing to json file data and re-try
+                    for(final Map.Entry<String, JsonElement> defaultEntry: defaultConfig.asMap().entrySet())
+                    {
+                        if (!jsonFileData.has(defaultEntry.getKey()))
+                        {
+                            jsonFileData.add(defaultEntry.getKey(),defaultEntry.getValue());
+                        }
+                    }
+
+                    try
+                    {
+                        commonConfig.deserialize(jsonFileData);
+                        save();
+                        Cupboard.LOGGER.info("Loaded config for: " + filename);
+                        return;
+                    }
+                    catch (Exception exception)
+                    {
+
+                    }
+                }
+
                 Cupboard.LOGGER.error("Could not read config " + filename + " from:" + configPath, e);
 
-                try {
-                    commonConfig = (C) commonConfig.getClass().getDeclaredConstructor().newInstance();
-                } catch (Throwable ex) {
-                    Cupboard.LOGGER.warn("Error reinitialising config", ex);
-                }
                 if (loaded < 3 && manualReload) {
                     save();
                     load();

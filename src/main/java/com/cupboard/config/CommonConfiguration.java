@@ -7,6 +7,7 @@ public class CommonConfiguration implements ICommonConfig
     public boolean showCommandExecutionErrors = true;
     public boolean debugChunkloadAttempts = false;
     public boolean logOffthreadEntityAdd = true;
+    public boolean forceHeapDumpOnOOM = false;
 
     public CommonConfiguration()
     {
@@ -31,6 +32,11 @@ public class CommonConfiguration implements ICommonConfig
         entry3.addProperty("logOffthreadEntityAdd", logOffthreadEntityAdd);
         root.add("logOffthreadEntityAdd", entry3);
 
+        final JsonObject entry4 = new JsonObject();
+        entry4.addProperty("desc:", "Enables creating a heap dump automatically once the game crashes with an out of memory issue, use with care heapdumps take a lot of space. default:false");
+        entry4.addProperty("forceHeapDumpOnOOM", forceHeapDumpOnOOM);
+        root.add("forceHeapDumpOnOOM", entry4);
+
         return root;
     }
 
@@ -39,5 +45,6 @@ public class CommonConfiguration implements ICommonConfig
         showCommandExecutionErrors = data.get("showCommandExecutionErrors").getAsJsonObject().get("showCommandExecutionErrors").getAsBoolean();
         debugChunkloadAttempts = data.get("debugChunkloadAttempts").getAsJsonObject().get("debugChunkloadAttempts").getAsBoolean();
         logOffthreadEntityAdd = data.get("logOffthreadEntityAdd").getAsJsonObject().get("logOffthreadEntityAdd").getAsBoolean();
+        forceHeapDumpOnOOM = data.get("forceHeapDumpOnOOM").getAsJsonObject().get("forceHeapDumpOnOOM").getAsBoolean();
     }
 }
