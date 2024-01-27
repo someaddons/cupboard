@@ -96,6 +96,8 @@ public class BlockSearch
             }
 
             y += y_offset;
+            y_offset = y_offset > 0 ? y_offset + 1 : y_offset - 1;
+            y_offset *= -1;
         }
 
         return null;
