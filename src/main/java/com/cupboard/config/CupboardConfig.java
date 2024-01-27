@@ -167,7 +167,7 @@ public class CupboardConfig<C extends ICommonConfig> {
                     final JsonObject defaultConfig = commonConfig.serialize();
 
                     // Add missing to json file data and re-try
-                    for (final Map.Entry<String, JsonElement> defaultEntry : defaultConfig.asMap().entrySet())
+                    for (final Map.Entry<String, JsonElement> defaultEntry : defaultConfig.entrySet())
                     {
                         if (!jsonFileData.has(defaultEntry.getKey()))
                         {
