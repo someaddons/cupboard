@@ -1,7 +1,6 @@
 package com.cupboard.util;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.BlockGetter;
 
 import java.util.function.BiPredicate;
@@ -27,7 +26,7 @@ public class BlockSearch
      * @return
      */
     public static BlockPos findAround(
-      final ServerLevel world,
+      final BlockGetter world,
       final BlockPos start,
       final int verticalRange,
       final int horizontalRange,
