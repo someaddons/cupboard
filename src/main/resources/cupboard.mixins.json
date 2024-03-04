@@ -5,10 +5,11 @@
   "compatibilityLevel": "JAVA_17",
   "mixinPriority": 200,
   "mixins": [
+    "ChunkLoadDebug",
     "CommandExceptionLoggingMixin",
-    "ThreadingDetectorMixin",
+    "EntityLoadMixin",
     "ServerAddEntityMixin",
-    "ChunkLoadDebug"
+    "ThreadingDetectorMixin"
   ],
   "client": [
   ],
