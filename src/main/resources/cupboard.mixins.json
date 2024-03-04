@@ -6,10 +6,11 @@
   "refmap": "cupboard.refmap.json",
   "mixinPriority": 200,
   "mixins": [
+    "ChunkLoadDebug",
     "CommandExceptionLoggingMixin",
-    "ThreadingDetectorMixin",
+    "EntityLoadMixin",
     "ServerAddEntityMixin",
-    "ChunkLoadDebug"
+    "ThreadingDetectorMixin"
   ],
   "client": [
   ],

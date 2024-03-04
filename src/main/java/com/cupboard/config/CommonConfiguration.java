@@ -7,6 +7,7 @@ public class CommonConfiguration implements ICommonConfig
     public boolean showCommandExecutionErrors = true;
     public boolean debugChunkloadAttempts     = false;
     public boolean logOffthreadEntityAdd      = true;
+    public boolean skipErrorOnEntityLoad      = false;
     public boolean forceHeapDumpOnOOM         = false;
 
     public CommonConfiguration()
@@ -24,9 +25,15 @@ public class CommonConfiguration implements ICommonConfig
 
         final JsonObject entry2 = new JsonObject();
         entry2.addProperty("desc:",
-          "Enables debug logging of chunks being forceloaded on serverthread by directly accessing an unloaded chunk, which stalls the server until the chunk finishes loading: default:false");
+          "Enables debug logging of chunks being forceloaded on serverthread by directly accessing an unloaded chunk, which stalls the server until the chunk finishes loading, incompatible with lithium and its forks: default:false");
         entry2.addProperty("debugChunkloadAttempts", debugChunkloadAttempts);
         root.add("debugChunkloadAttempts", entry2);
+
+        final JsonObject entry5 = new JsonObject();
+        entry5.addProperty("desc:",
+          "Prevent crashes on entity loading: default:false");
+        entry5.addProperty("skipErrorOnEntityLoad", skipErrorOnEntityLoad);
+        root.add("skipErrorOnEntityLoad", entry5);
 
         final JsonObject entry3 = new JsonObject();
         entry3.addProperty("desc:",
@@ -46,6 +53,7 @@ public class CommonConfiguration implements ICommonConfig
     public void deserialize(JsonObject data)
     {
         showCommandExecutionErrors = data.get("showCommandExecutionErrors").getAsJsonObject().get("showCommandExecutionErrors").getAsBoolean();
+        skipErrorOnEntityLoad = data.get("skipErrorOnEntityLoad").getAsJsonObject().get("skipErrorOnEntityLoad").getAsBoolean();
         debugChunkloadAttempts = data.get("debugChunkloadAttempts").getAsJsonObject().get("debugChunkloadAttempts").getAsBoolean();
         logOffthreadEntityAdd = data.get("logOffthreadEntityAdd").getAsJsonObject().get("logOffthreadEntityAdd").getAsBoolean();
         forceHeapDumpOnOOM = data.get("forceHeapDumpOnOOM").getAsJsonObject().get("forceHeapDumpOnOOM").getAsBoolean();
