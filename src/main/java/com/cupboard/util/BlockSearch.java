@@ -2,6 +2,7 @@ package com.cupboard.util;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 
 import java.util.function.BiPredicate;
 
@@ -38,24 +39,42 @@ public class BlockSearch
             return null;
         }
 
-        BlockPos temp;
+        BlockPos.MutableBlockPos temp = new BlockPos.MutableBlockPos();
         int y = 0;
         int y_offset = yStep;
+
+        boolean checkLoaded = world instanceof Level;
+        Level level = checkLoaded ? (Level) world : null;
 
         for (int i = 0; i < verticalRange + 2; i++)
         {
             for (int steps = 1; steps <= horizontalRange; steps++)
             {
                 // Start topleft of middle point
-                temp = start.offset(-steps, y, -steps);
+                temp.set(start.getX() - steps, start.getY() + y, start.getZ() - steps);
 
                 // X ->
                 for (int x = 0; x <= steps; x++)
                 {
-                    temp = temp.offset(1, 0, 0);
-                    if (predicate.test(world, temp))
+                    temp.set(temp.getX() + 1, temp.getX(), temp.getZ());
+
+                    if (checkLoaded)
                     {
-                        return temp;
+                        if (level.hasChunk(temp.getX() >> 4, temp.getZ() >> 4))
+                        {
+
+                            if (predicate.test(world, temp))
+                            {
+                                return temp;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (predicate.test(world, temp))
+                        {
+                            return temp;
+                        }
                     }
                 }
 
@@ -64,20 +83,47 @@ public class BlockSearch
                 // v
                 for (int z = 0; z <= steps; z++)
                 {
-                    temp = temp.offset(0, 0, 1);
-                    if (predicate.test(world, temp))
+                    temp.set(temp.getX(), temp.getY(), temp.getZ() + 1);
+
+                    if (checkLoaded)
                     {
-                        return temp;
+                        if (level.hasChunk(temp.getX() >> 4, temp.getZ() >> 4))
+                        {
+                            if (predicate.test(world, temp))
+                            {
+                                return temp;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (predicate.test(world, temp))
+                        {
+                            return temp;
+                        }
                     }
                 }
 
                 // < - X
                 for (int x = 0; x <= steps; x++)
                 {
-                    temp = temp.offset(-1, 0, 0);
-                    if (predicate.test(world, temp))
+                    temp.set(temp.getX() - 1, temp.getY(), temp.getZ());
+                    if (checkLoaded)
                     {
-                        return temp;
+                        if (level.hasChunk(temp.getX() >> 4, temp.getZ() >> 4))
+                        {
+                            if (predicate.test(world, temp))
+                            {
+                                return temp;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (predicate.test(world, temp))
+                        {
+                            return temp;
+                        }
                     }
                 }
 
@@ -86,10 +132,23 @@ public class BlockSearch
                 // X
                 for (int z = 0; z <= steps; z++)
                 {
-                    temp = temp.offset(0, 0, -1);
-                    if (predicate.test(world, temp))
+                    temp.set(temp.getX(), temp.getY(), temp.getZ() - 1);
+                    if (checkLoaded)
                     {
-                        return temp;
+                        if (level.hasChunk(temp.getX() >> 4, temp.getZ() >> 4))
+                        {
+                            if (predicate.test(world, temp))
+                            {
+                                return temp;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (predicate.test(world, temp))
+                        {
+                            return temp;
+                        }
                     }
                 }
             }
