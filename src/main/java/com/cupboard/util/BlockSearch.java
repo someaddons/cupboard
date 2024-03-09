@@ -56,7 +56,7 @@ public class BlockSearch
                 // X ->
                 for (int x = 0; x <= steps; x++)
                 {
-                    temp.set(temp.getX() + 1, temp.getX(), temp.getZ());
+                    temp.set(temp.getX() + 1, temp.getY(), temp.getZ());
 
                     if (checkLoaded)
                     {
