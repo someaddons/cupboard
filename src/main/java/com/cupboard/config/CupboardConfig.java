@@ -8,7 +8,6 @@ import com.google.gson.JsonObject;
 import net.fabricmc.loader.api.FabricLoader;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
@@ -120,7 +119,7 @@ public class CupboardConfig<C extends ICommonConfig> {
     /**
      * Loaded clientside, not synced
      */
-    final static Gson gson = new GsonBuilder().setPrettyPrinting().disableHtmlEscaping().create();
+    final static Gson gson = new GsonBuilder().setPrettyPrinting().setLenient().disableHtmlEscaping().create();
 
     /**
      * Builds configuration tree.
@@ -209,13 +208,65 @@ public class CupboardConfig<C extends ICommonConfig> {
     /**
      * Saves the config to file
      */
-    public void save() {
+    public void save()
+    {
         saveCounter++;
-        try (BufferedWriter writer = Files.newBufferedWriter(configPath)) {
-            gson.toJson(commonConfig.serialize(), JsonObject.class, writer);
+        try
+        {
+            writeConfig(commonConfig.serialize());
         } catch (Throwable e) {
             Cupboard.LOGGER.error("Could not write config " + filename + " to:" + configPath, e);
         }
+    }
+
+    private void writeConfig(JsonObject json) throws IOException
+    {
+        String prettyJson = gson.toJson(json);
+
+        StringBuilder result = new StringBuilder();
+        for (String line : prettyJson.split("\\R"))
+        {
+            String trimmed = line.trim();
+            if (trimmed.startsWith("\"desc") && trimmed.matches("^\"desc[^\"]{0,3}\"\\s*:.*"))
+            {
+                String indent = line.substring(0, line.indexOf('"'));
+
+                // Remove the property's trailing comma if Gson added one
+                String property = trimmed;
+
+                if (property.endsWith(","))
+                {
+                    property = property.substring(0, property.length() - 1);
+                }
+
+                // Turn the single property into a valid temporary JSON object
+                JsonObject descObject = gson.fromJson(
+                    "{" + property + "}",
+                    JsonObject.class
+                );
+
+                // We don't care whether the key is desc, desc1, desc:, etc.
+                Map.Entry<String, JsonElement> descEntry =
+                    descObject.entrySet().iterator().next();
+
+                String description = descEntry.getValue().getAsString();
+
+                for (String descLine : description.split("\\R", -1))
+                {
+                    result.append(indent)
+                        .append("// ")
+                        .append(descLine)
+                        .append(System.lineSeparator());
+                }
+            }
+            else
+            {
+                result.append(line)
+                    .append(System.lineSeparator());
+            }
+        }
+
+        Files.writeString(configPath, result.toString());
     }
 
     public C getCommonConfig() {
