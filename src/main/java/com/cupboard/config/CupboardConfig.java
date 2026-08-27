@@ -14,21 +14,24 @@ import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
 
-public class CupboardConfig<C extends ICommonConfig> {
+public class CupboardConfig<C extends ICommonConfig>
+{
 
-    private static Set<CupboardConfig> allConfigs = new HashSet<>();
-    private static WatchService watchService = null;
+    private static Set<CupboardConfig>         allConfigs     = new HashSet<>();
+    private static WatchService                watchService   = null;
     private static Map<String, CupboardConfig> watchedConfigs = new HashMap<>();
     private final static Map<CupboardConfig, Integer> scheuledReloads = new HashMap<>();
-    private static long lastUpdate = 0;
+    private static long                        lastUpdate     = 0;
 
     private static boolean initializedALl = false;
 
     /**
      * Loads all registered configs
      */
-    public static void initloadAll() {
-        for (CupboardConfig config : CupboardConfig.allConfigs) {
+    public static void initloadAll()
+    {
+        for (CupboardConfig config : CupboardConfig.allConfigs)
+        {
             config.getCommonConfig();
             if (Cupboard.IS_CLIENT_OR_INTEGRATED)
             {
@@ -40,15 +43,21 @@ public class CupboardConfig<C extends ICommonConfig> {
 
     /**
      * Registers the given config and adds a watch entry
+     *
      * @param config
      */
-    private static void registerConfig(final CupboardConfig config) {
-        if (!allConfigs.contains(config)) {
+    private static void registerConfig(final CupboardConfig config)
+    {
+        if (!allConfigs.contains(config))
+        {
             allConfigs.add(config);
-            try {
+            try
+            {
                 config.configPath.getParent().register(getWatchService(), StandardWatchEventKinds.ENTRY_MODIFY);
                 watchedConfigs.put(config.filename, config);
-            } catch (IOException e) {
+            }
+            catch (IOException e)
+            {
                 Cupboard.LOGGER.warn("Failed to register config path to file watcher", e);
             }
         }
@@ -56,13 +65,19 @@ public class CupboardConfig<C extends ICommonConfig> {
 
     /**
      * Get watch service
+     *
      * @return
      */
-    private static WatchService getWatchService() {
-        if (watchService == null) {
-            try {
+    private static WatchService getWatchService()
+    {
+        if (watchService == null)
+        {
+            try
+            {
                 watchService = FileSystems.getDefault().newWatchService();
-            } catch (Throwable e) {
+            }
+            catch (Throwable e)
+            {
                 Cupboard.LOGGER.warn("Failed to create config file watcher", e);
             }
         }
@@ -73,20 +88,27 @@ public class CupboardConfig<C extends ICommonConfig> {
     /**
      * Polls the watch server for changes once a second
      */
-    public static void pollConfigs() {
-        if (System.currentTimeMillis() - lastUpdate > 1000) {
+    public static void pollConfigs()
+    {
+        if (System.currentTimeMillis() - lastUpdate > 1000)
+        {
             lastUpdate = System.currentTimeMillis();
-        } else {
+        }
+        else
+        {
             return;
         }
 
         WatchKey watchKey = getWatchService().poll();
-        if (watchKey != null) {
-            for (WatchEvent<?> event : watchKey.pollEvents()) {
-                if (event.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
+        if (watchKey != null)
+        {
+            for (WatchEvent<?> event : watchKey.pollEvents())
+            {
+                if (event.kind() == StandardWatchEventKinds.ENTRY_MODIFY)
+                {
 
                     final CupboardConfig config = watchedConfigs.get(event.context().toString());
-                     if (config != null)
+                    if (config != null)
                     {
                         if (config.saveCounter > 0)
                         {
@@ -103,11 +125,15 @@ public class CupboardConfig<C extends ICommonConfig> {
             watchKey.reset();
         }
 
-        for (final Iterator<Map.Entry<CupboardConfig, Integer>> iterator = scheuledReloads.entrySet().iterator(); iterator.hasNext(); ) {
+        for (final Iterator<Map.Entry<CupboardConfig, Integer>> iterator = scheuledReloads.entrySet().iterator(); iterator.hasNext(); )
+        {
             Map.Entry<CupboardConfig, Integer> entry = iterator.next();
-            if (entry.getValue() > 0) {
+            if (entry.getValue() > 0)
+            {
                 entry.setValue(entry.getValue() - 1);
-            } else {
+            }
+            else
+            {
                 iterator.remove();
                 entry.getKey().load(false);
             }
@@ -117,7 +143,7 @@ public class CupboardConfig<C extends ICommonConfig> {
     /**
      * Loaded everywhere, not synced
      */
-    private C commonConfig;
+    private       C      commonConfig;
     private final String filename;
     private       int    loaded = 0;
     private       int    saveCounter = 0;
@@ -139,24 +165,28 @@ public class CupboardConfig<C extends ICommonConfig> {
         registerConfig(this);
     }
 
-    public void load() {
+    public void load()
+    {
         load(true);
     }
 
     /**
      * Loads the config from file
      */
-    public void load(boolean manualReload) {
+    public void load(boolean manualReload)
+    {
         loaded++;
         final File config = configPath.toFile();
 
         if (!config.exists()) {
             Cupboard.LOGGER.warn("Config " + filename + " not found, recreating default");
-            if (loaded < 3 && manualReload) {
+            if (loaded < 3 && manualReload)
+            {
                 save();
                 load();
             }
-        } else
+        }
+        else
         {
 
             JsonObject jsonFileData = null;
@@ -226,7 +256,9 @@ public class CupboardConfig<C extends ICommonConfig> {
         try
         {
             writeConfig(commonConfig.serialize());
-        } catch (Throwable e) {
+        }
+        catch (Throwable e)
+        {
             Cupboard.LOGGER.error("Could not write config " + filename + " to:" + configPath, e);
         }
     }
@@ -236,14 +268,14 @@ public class CupboardConfig<C extends ICommonConfig> {
         String prettyJson = gson.toJson(json);
 
         StringBuilder result = new StringBuilder();
+
+        boolean previousDesc = false;
         for (String line : prettyJson.split("\\R"))
         {
             String trimmed = line.trim();
             if (trimmed.startsWith("\"desc") && trimmed.matches("^\"desc[^\"]{0,3}\"\\s*:.*"))
             {
                 String indent = line.substring(0, line.indexOf('"'));
-
-                // Remove the property's trailing comma if Gson added one
                 String property = trimmed;
 
                 if (property.endsWith(","))
@@ -251,38 +283,84 @@ public class CupboardConfig<C extends ICommonConfig> {
                     property = property.substring(0, property.length() - 1);
                 }
 
-                // Turn the single property into a valid temporary JSON object
                 JsonObject descObject = gson.fromJson(
                     "{" + property + "}",
                     JsonObject.class
                 );
 
-                // We don't care whether the key is desc, desc1, desc:, etc.
                 Map.Entry<String, JsonElement> descEntry =
                     descObject.entrySet().iterator().next();
 
                 String description = descEntry.getValue().getAsString();
 
+                if (previousDesc)
+                {
+                    result.append(System.lineSeparator());
+                }
+
+                description = description.replace("Default", "\nDefault").replace("default", "\nDefault");
+                List<String> lines = new ArrayList<>();
                 for (String descLine : description.split("\\R", -1))
+                {
+                    lines.addAll(splitLongDesc(descLine, new ArrayList<String>()));
+                }
+
+                for (String descLine : lines)
                 {
                     result.append(indent)
                         .append("// ")
                         .append(descLine)
                         .append(System.lineSeparator());
                 }
+
+                previousDesc = true;
             }
             else
             {
+                previousDesc = false;
                 result.append(line)
                     .append(System.lineSeparator());
+                if (line.endsWith(","))
+                {
+                    result.append(System.lineSeparator());
+                }
             }
         }
 
         Files.writeString(configPath, result.toString());
     }
 
-    public C getCommonConfig() {
-        if (loaded == 0) {
+    private List<String> splitLongDesc(final String descLine, final ArrayList<String> lines)
+    {
+        if (descLine.length() > 100)
+        {
+            final String fullLine = descLine.substring(0, 100) + descLine.substring(100).replaceFirst("([.,])\\s*", "$1\n");
+            String[] split = fullLine.split("\\R");
+            for (int i = 0; i < split.length; i++)
+            {
+                final String splitString = split[i];
+                if (i == 0)
+                {
+                    lines.add(splitString);
+                }
+                else
+                {
+                    splitLongDesc(splitString, lines);
+                }
+            }
+        }
+        else
+        {
+            lines.add(descLine);
+        }
+
+        return lines;
+    }
+
+    public C getCommonConfig()
+    {
+        if (loaded == 0)
+        {
             load();
         }
 
@@ -290,11 +368,14 @@ public class CupboardConfig<C extends ICommonConfig> {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {
+    public boolean equals(Object o)
+    {
+        if (this == o)
+        {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null || getClass() != o.getClass())
+        {
             return false;
         }
         final CupboardConfig<?> config = (CupboardConfig<?>) o;
@@ -302,7 +383,8 @@ public class CupboardConfig<C extends ICommonConfig> {
     }
 
     @Override
-    public int hashCode() {
+    public int hashCode()
+    {
         return configPath.hashCode();
     }
 
