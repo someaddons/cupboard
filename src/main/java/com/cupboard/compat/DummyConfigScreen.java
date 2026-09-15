@@ -1,6 +1,7 @@
 package com.cupboard.compat;
 
 import com.cupboard.config.CupboardConfig;
+import com.mojang.blaze3d.Blaze3D;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
@@ -17,6 +18,6 @@ public class DummyConfigScreen extends Screen
 
     public void openConfigFile()
     {
-        Util.getPlatform().openFile(config.getPath().toFile());
+        Blaze3D.openPath(config.getPath());
     }
 }
