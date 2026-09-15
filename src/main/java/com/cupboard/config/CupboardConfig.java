@@ -17,9 +17,9 @@ import java.util.*;
 public class CupboardConfig<C extends ICommonConfig>
 {
 
-    private static Set<CupboardConfig>         allConfigs     = new HashSet<>();
-    private static WatchService                watchService   = null;
-    private static Map<String, CupboardConfig> watchedConfigs = new HashMap<>();
+    private static final Set<CupboardConfig>         allConfigs     = new HashSet<>();
+    private static       WatchService                watchService   = null;
+    private static final Map<String, CupboardConfig> watchedConfigs = new HashMap<>();
     private final static Map<CupboardConfig, Integer> scheuledReloads = new HashMap<>();
     private static long                        lastUpdate     = 0;
 
@@ -143,7 +143,7 @@ public class CupboardConfig<C extends ICommonConfig>
     /**
      * Loaded everywhere, not synced
      */
-    private       C      commonConfig;
+    private final C commonConfig;
     private final String filename;
     private       int        loaded       = 0;
     private       int        saveCounter  = 0;
@@ -272,10 +272,11 @@ public class CupboardConfig<C extends ICommonConfig>
         StringBuilder result = new StringBuilder();
 
         boolean previousDesc = false;
+        boolean endsWithCommata = false;
         for (String line : prettyJson.split("\\R"))
         {
             String trimmed = line.trim();
-            if (trimmed.startsWith("\"desc") && trimmed.matches("^\"desc[^\"]{0,3}\"\\s*:.*"))
+            if (trimmed.startsWith("\"desc") && trimmed.matches("^\"desc[^\"]{0,15}\"\\s*:.*"))
             {
                 String indent = line.substring(0, line.indexOf('"'));
                 String property = trimmed;
@@ -295,12 +296,17 @@ public class CupboardConfig<C extends ICommonConfig>
 
                 String description = descEntry.getValue().getAsString();
 
-                if (previousDesc)
+                if (previousDesc || endsWithCommata)
                 {
                     result.append(System.lineSeparator());
                 }
 
-                description = description.replace("Default", "\nDefault").replace("default", "\nDefault");
+                int defaultIndex = description.lastIndexOf("Default");
+                defaultIndex = Math.max(defaultIndex, description.lastIndexOf("default"));
+                if (defaultIndex != -1)
+                {
+                    description = description.substring(0, defaultIndex) + description.substring(defaultIndex).replace("Default", "\nDefault").replace("default", "\nDefault");
+                }
                 List<String> lines = new ArrayList<>();
                 for (String descLine : description.split("\\R", -1))
                 {
@@ -320,11 +326,16 @@ public class CupboardConfig<C extends ICommonConfig>
             else
             {
                 previousDesc = false;
+                endsWithCommata = false;
                 result.append(line)
                     .append(System.lineSeparator());
-                if (line.endsWith(","))
+                if (line.endsWith("},"))
                 {
                     result.append(System.lineSeparator());
+                }
+                else
+                {
+                    endsWithCommata = line.endsWith(",");
                 }
             }
         }
@@ -336,7 +347,7 @@ public class CupboardConfig<C extends ICommonConfig>
     {
         if (descLine.length() > 100)
         {
-            final String fullLine = descLine.substring(0, 100) + descLine.substring(100).replaceFirst("([.,])\\s*", "$1\n");
+            final String fullLine = descLine.substring(0, 80) + descLine.substring(80).replaceFirst("((?<!latest)(?<!e\\.g)\\.(?!g\\.)|,)\\h*", "$1\n");
             String[] split = fullLine.split("\\R");
             for (int i = 0; i < split.length; i++)
             {
@@ -347,7 +358,18 @@ public class CupboardConfig<C extends ICommonConfig>
                 }
                 else
                 {
-                    splitLongDesc(splitString, lines);
+                    // If the split-off line is too short, merge it again
+                    if (splitString.length() < 20)
+                    {
+                        int lastIndex = lines.size() - 1;
+                        final String mergedLine = lines.get(lastIndex) + " " + splitString;
+                        lines.remove(lastIndex);
+                        lines.add(mergedLine);
+                    }
+                    else
+                    {
+                        splitLongDesc(splitString, lines);
+                    }
                 }
             }
         }
