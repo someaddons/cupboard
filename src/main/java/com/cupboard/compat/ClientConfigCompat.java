@@ -3,6 +3,7 @@ package com.cupboard.compat;
 import com.cupboard.Cupboard;
 import com.cupboard.config.CupboardConfig;
 import com.cupboard.config.ICommonConfig;
+import com.mojang.blaze3d.Blaze3D;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Util;
@@ -64,7 +65,7 @@ public class ClientConfigCompat
         {
             bestMatch.registerExtensionPoint(IConfigScreenFactory.class, (container, modListScreen) ->
             {
-                Util.getPlatform().openFile(config.getPath().toFile());
+                Blaze3D.openPath(config.getPath());
                 return Minecraft.getInstance().gui.screen();
             });
         }
